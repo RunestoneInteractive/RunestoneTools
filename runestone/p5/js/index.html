@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=768, initial-scale=1">
+<link rel="stylesheet" href="static/vendor/prism.css">
+<link rel="stylesheet" href="static/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
+<title>p5.js-widget</title>
+
+<a class="github-fork-ribbon" href="https://github.com/toolness/p5.js-widget" title="Fork me on GitHub">Fork me on GitHub</a>
+
+<h1>p5.js-widget</h1>
+<p>
+  This is a reusable widget that makes it easier to embed editable
+  <a href="http://p5js.org">p5.js</a> sketches in blog posts,
+  interactive curricula, and other places.
+</p>
+
+<h2>Table of Contents</h2>
+
+<ol>
+  <li><a href="#quick-start">Quick Start</a>
+  <li><a href="#autoplay">Autoplay</a>
+  <li><a href="#autosave">Autosave</a>
+  <li><a href="#implicit-setup">Implicit <code>setup()</code></a>
+  <li><a href="#error-handling">Error Handling</a>
+  <li><a href="#resizing">Resizing</a>
+  <li><a href="#specifying-p5-version">Specifying The p5 Version</a>
+  <li><a href="#base-url">Specifying The Base URL</a>
+  <li><a href="#src">Loading From An External File</a>
+  <li><a href="#wordpress">Using the Widget with Wordpress</a>
+</ol>
+
+<h2 id="quick-start">Quick Start</h2>
+
+<p>
+  To use this widget, add the following script to your page:
+</p>
+
+<pre><code class="language-markup" id="script-tag-example"></code></pre>
+
+<p>
+  The script will then automatically transform all script tags of
+  type <code>text/p5</code> on the page into editable widgets, like so:
+</p>
+
+<script type="text/p5">
+function setup() {
+  createCanvas(100, 100);
+}
+
+function draw() {
+  background(255, 0, 200);
+}
+</script>
+
+<h2 id="autoplay">Autoplay</h2>
+
+<p>
+  Note that by default, the sketch will <em>not</em> start playing
+  automatically. This can be changed via the <code>data-autoplay</code>
+  attribute like so:
+</p>
+
+<script type="text/p5" data-autoplay>
+function setup() {
+  createCanvas(100, 100);
+  background(255, 0, 200);
+}
+</script>
+
+<h2 id="autosave">Autosave</h2>
+
+<p>
+  The widget automatically saves the current editor content in the
+  current <em>page session</em>, and restores it on page load.
+  From the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage">Mozilla Developer Network</a>:
+</p>
+
+<blockquote>
+  A page session lasts for as long as the browser is open and survives
+  over page reloads and restores. Opening a page in a new tab or window
+  will cause a new session to be initiated.
+</blockquote>
+
+<p>
+  This generally means that if a user accidentally navigates
+  away from the page, their work won't be lost if they navigate
+  back to it via their browser's back/forward buttons or
+  its <a href="http://www.computerhope.com/tips/tip16.htm">undo
+  closed tab</a> functionality.
+</p>
+
+<p>
+  Users always have the freedom to revert the widget's code to
+  its initial  state (i.e., the code specified by the embedding page)
+  via the "Revert" button on the toolbar.
+</p>
+
+<p>
+  In some cases, the above behavior may be undesirable. If you
+  want to be able to disable it or otherwise configure it to behave
+  differently, please feel free to
+  <a href="https://github.com/toolness/p5.js-widget/issues/new">file
+  an issue</a>.
+</p>
+
+<h2 id="implicit-setup">Implicit <code>setup()</code></h2>
+
+<p>
+  It can be quite difficult for beginners to understand the
+  concept (and syntax) of functions, so the widget will automatically
+  wrap the user's code in a <code>setup()</code> function declaration
+  behind the scenes if needed:
+</p>
+
+<script type="text/p5" data-autoplay>
+background(255, 0, 200);
+</script>
+
+<h2 id="error-handling">Error Handling</h2>
+
+<p>
+  The widget is intended to be resilient against various types of
+  user error. In the future, we'd like to improve the widget to
+  provide more
+  <a href="http://processing.toolness.org">friendly errors</a>.
+</p>
+
+<p>
+  Here's what happens when the sketch has runtime errors. Note that the
+  exact description of the error is browser-specific and can't be changed.
+</p>
+
+<script type="text/p5" data-autoplay data-hide-sourcecode>
+function setup() {
+  // Reference a non-existent variable...
+  KABOOM
+}
+</script>
+
+<p>
+  Here's what happens when the sketch has syntax errors (which prevent the
+  sketch from running entirely). Currently, the syntax errors are
+  browser-specific, though this may change in the future.
+</p>
+
+<script type="text/p5" data-autoplay data-hide-sourcecode>
+// Syntax error (no parentheses after function name)
+function setup {
+}
+</script>
+
+<p>
+  Here's what happens when the sketch is in a loop for more than
+  one second (which is a good indication that the user has accidentally
+  written an infinite loop). The message is <em>not</em> browser-specific.
+</p>
+
+<script type="text/p5" data-hide-sourcecode>
+function setup() {
+  // Infinite loop!
+  while (true) {}
+}
+</script>
+
+<h2 id="resizing">Resizing</h2>
+
+<p>
+  The height of the widget (and consequently the sketch preview pane too)
+  defaults to <span data-insert-default="HEIGHT"></span>px and can be changed
+  via the <code>data-height</code> attribute like so:
+</p>
+
+<script type="text/p5" data-height="600"></script>
+
+<p>
+  The width of the widget is always set to the full width of its
+  container element.
+</p>
+
+<p>
+  The width of the sketch preview pane defaults to
+  <span data-insert-default="PREVIEW_WIDTH"></span>px and can be set
+  via the <code>data-preview-width</code> attribute like so:
+</p>
+
+<script type="text/p5" data-autoplay data-preview-width="400">
+function setup() {
+  createCanvas(300, 100);
+  background(255, 0, 200);
+}
+</script>
+
+<h2 id="specifying-p5-version">Specifying The p5 Version</h2>
+
+<p>
+  Currently, the widget defaults to using p5 version
+  <span data-insert-default="P5_VERSION"></span>, but this will change
+  as new versions of p5 and this widget are released.
+</p>
+
+<p>
+  It's possible to optionally specify the p5 version to use in your
+  widget via the <code>data-p5-version</code> attribute:
+</p>
+
+<pre><code class="language-markup">&lt;script type="text/p5" data-p5-version="0.2.0"&gt;</code></pre>
+
+<p>
+  A complete list of available versions can be found at
+  <a href="https://cdnjs.com/libraries/p5.js">cdnjs.com/libraries/p5.js</a>.
+</p>
+
+<h2 id="base-url">Specifying The Base URL</h2>
+
+<p>
+  By default, the widget will set the base URL of the sketch to
+  the URL of the page embedding the widget. This means that if
+  you're embedding this widget at
+  <code>http://example.org/index.html</code> and have the following
+  code in your sketch:
+</p>
+
+<pre><code class="language-javascript">loadJSON('foo.json');</code></pre>
+
+<p>
+  The actual URL retrieved will be
+  <code>http://example.org/foo.json</code>.
+</p>
+
+<p>
+  If you'd like to override this default, you can specify a
+  custom base URL with the <code>data-base-url</code>
+  attribute like so:
+</p>
+
+<pre><code class="language-markup">&lt;script type="text/p5" data-base-url="http://some-other-website.com/"&gt;</code></pre>
+
+<h2 id="src">Loading From An External File</h2>
+
+<p>
+  The <code>src</code> attribute can be used to load the widget's
+  content from an external file instead of specifying it inline. For
+  example, the following will load the widget's content from
+  <code><a href="static/my-example.js">static/my-example.js</a></code>:
+</p>
+
+<script type="text/p5" src="static/my-example.js"></script>
+
+<p>
+  If the URL is relative, then it will be retrieved relative to the URL
+  of the embedding page. If it is absolute, then an attempt to
+  retrieve it will be made; however, like many cross-origin network calls
+  within p5 itself, the file must have <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS">Cross-Origin Resource Sharing (CORS)</a>
+  enabled, or it will not be retrieved successfully.
+</p>
+
+<h2 id="wordpress">Using the Widget with Wordpress</h2>
+
+<p>
+  To embed the widget on a Wordpress page, copy and paste the widget 
+  script into your page in <a href="https://codex.wordpress.org/Writing_Posts#Visual_Versus_Text_Editor">"Text" mode</a> as opposed to "Visual" mode. Then, enclose the widget script in <code>&lt;pre&gt;</code> tags. These <code>&lt;pre&gt;</code> tags instruct Wordpress to exactly reproduce whatever is inside of them without adding additional formatting. Here's what they look like wrapped around the widget script:
+</p>
+
+<pre><code class="language-markup">&lt;pre&gt;
+&lt;script type="text/p5"&gt;
+function setup() {
+  createCanvas(100, 100);
+}
+
+function draw() {
+  background(255, 0, 200);
+}
+
+/* And so on... */
+&lt;/script&gt;
+&lt;/pre&gt;
+</code></pre>
+
+<script src="static/vendor/jquery.js"></script>
+<script src="p5-widget.js" data-manual></script>
+<script src="static/vendor/prism.js" data-manual></script>
+<script src="static/index.js"></script>
