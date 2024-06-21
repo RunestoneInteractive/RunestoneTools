@@ -19,6 +19,7 @@ import "codemirror/mode/htmlmixed/htmlmixed.js";
 import "codemirror/mode/xml/xml.js";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/mode/sql/sql.js";
+import "codemirror/mode/java/java.js";
 import "codemirror/mode/clike/clike.js";
 import "codemirror/mode/octave/octave.js";
 import "./../css/activecode.css";
@@ -51,9 +52,26 @@ window.edList = {};
 var socket, connection, doc;
 var chatcodesServer = "chat.codes";
 
-CodeMirror.commands.autocomplete = function (cm) {
-    cm.showHint({ hint: CodeMirror.hint.anyword });
-};
+CodeMirror.commands.autocomplete = function(cm) {
+    var doc = cm.getDoc();
+    var POS = doc.getCursor();
+    var mode = CodeMirror.innerMode(cm.getMode(), cm.getTokenAt(POS).state).mode.name;
+    console.log(mode)   
+    if (mode == 'xml') { //html depends on xml
+        CodeMirror.showHint(cm, CodeMirror.hint.html);
+    } else if (mode == 'javascript') {
+        CodeMirror.showHint(cm, CodeMirror.hint.javascript);
+    } else if (mode == 'css') {
+        CodeMirror.showHint(cm, CodeMirror.hint.css);
+    } else if (mode == 'python') {
+        CodeMirror.showHint(cm, CodeMirror.hint.python);
+   // } else if (mode == 'cplusplus') {
+     //   CodeMirror.showHint(cm, CodeMirror.hint.cplusplus);
+    } else {
+        CodeMirror.showHint(cm, CodeMirror.hint.cplusplus);
+            //cm.showHint({ hint: CodeMirror.hint.anyword });
+     }
+ };
 
 // separate into constructor and init
 export class ActiveCode extends RunestoneBase {
