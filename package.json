@@ -39,7 +39,7 @@
         "micro-parsons": "https://github.com/amy21206/micro-parsons-element/releases/download/v0.1.4/micro-parsons-0.1.4.tgz",
         "select2": "^4.1.0-rc.0",
         "sql.js": "1.5.0",
-        "vega-embed": "3.14.0",
+        "vega-embed": "6.21.3",
         "wavedrom": "^2.0.0"
     }
 }
